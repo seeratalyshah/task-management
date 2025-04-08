@@ -6,7 +6,7 @@ import { Bell, Home, MessageSquare, MoreHorizontal } from "lucide-react";
 
 const Sidebar = () => {
   return (
-    <aside className="w-[70px] bg-[#0297b1] flex flex-col gap-y-4 items-center pt-[9px] pb-4 h-full">
+    <aside className="w-[70px] bg-[#4A154B] flex flex-col gap-y-4 items-center pt-[9px] pb-4 h-full">
       <WorkspaceSwitcher />
       <SidebarButton icon={Home} label="Home" isActive />
       <SidebarButton icon={MessageSquare} label="DMs" />

@@ -2,7 +2,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { cva, VariantProps } from "class-variance-authority";
-import Link from "next/link";
 import React from "react";
 
 const userItemVariants = cva(
@@ -11,7 +10,7 @@ const userItemVariants = cva(
     variants: {
       variant: {
         default: "text-[#f9edffcc]",
-        active: "text-[#0297b1] bg-white/90",
+        active: "text-[#4A154B] bg-white/90",
       },
     },
     defaultVariants: {
@@ -27,26 +26,27 @@ interface UserItemProps {
   variant?: VariantProps<typeof userItemVariants>["variant"];
 }
 
-const UserItem = ({ label = "Member", variant }: UserItemProps) => {
+const UserItem = ({ 
+  id, 
+  label = "Member", 
+  image, 
+  variant,
+  onClick 
+}: UserItemProps & { onClick?: () => void }) => {
   return (
     <Button
       variant="transparent"
-      className={cn(userItemVariants({ variant: variant }))}
+      className={cn(userItemVariants({ variant }))}
       size="sm"
-      asChild
+      onClick={onClick}
     >
-      <Link href="/workspace/1/member/1">
-        <Avatar className="size-5 rounded-md mr-1">
-          <AvatarImage
-            className="rounded-md"
-            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSnS1o3mO3S_Nkfw1WAGaRJ6KaOGgODpfoOsA&s"
-          />
-          <AvatarFallback className="rounded-md bg-sky-500 text-white text-xs">
-            S
-          </AvatarFallback>
-        </Avatar>
-        <span className="text-sm truncate">{label}</span>
-      </Link>
+      <Avatar className="size-5 rounded-md mr-1">
+        <AvatarImage className="rounded-md" src={image} />
+        <AvatarFallback className="rounded-md bg-sky-500 text-white text-xs">
+          {label.charAt(0)}
+        </AvatarFallback>
+      </Avatar>
+      <span className="text-sm truncate">{label}</span>
     </Button>
   );
 };

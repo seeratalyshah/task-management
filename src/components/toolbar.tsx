@@ -1,5 +1,4 @@
 import {
-  MessageSquareReplyIcon,
   MessageSquareTextIcon,
   Pencil,
   Smile,
@@ -24,7 +23,6 @@ export const Toolbar = ({
   isPending,
   handleEdit,
   handleDelete,
-  handleThread,
   handleReaction,
   hideThreadButton,
 }: ToolbarProps) => {

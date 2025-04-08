@@ -17,7 +17,7 @@ interface MessageProps {
   authorImage: string;
   authorName: string;
   isAuthor: boolean;
-  reactions: [];
+  reactions: any[];
   body: string;
   image: string;
   createdAt: string;
@@ -29,22 +29,39 @@ interface MessageProps {
   threadCount?: number;
   threadImage?: string;
   threadTimestamp?: number;
+  openThread?: (id: number) => void; // <-- New prop for opening thread
 }
 
-const formatFullTime = (date: Date) => {
+const formatFullTime = (dateInput: string | Date) => {
+  const date = typeof dateInput === "string" ? new Date(dateInput) : dateInput;
+  if (isNaN(date.getTime())) {
+    return "Unknown date";
+  }
   return `${isToday(date) ? "Today" : isYesterday(date) ? "Yesterday" : format(date, "MMM d, yyyy")} at ${format(date, "hh:mm:ss a")}`;
 };
 
 const Message = ({
+  id,
+  memberId,
+  authorImage,
+  authorName,
+  isAuthor,
+  reactions,
   body,
-  isCompact,
+  image,
+  createdAt,
   updatedAt,
   isEditing,
-  hideThreadButton,
+  isCompact,
   setEditingId,
+  hideThreadButton,
+  threadCount,
+  threadImage,
+  threadTimestamp,
+  openThread, // <-- Destructure the new prop
 }: MessageProps) => {
-  const createdAt = new Date();
-  const avatarFallback = "Seerat Ali".charAt(0).toUpperCase();
+  const avatarFallback = authorName.charAt(0).toUpperCase();
+
   if (isCompact) {
     return (
       <div
@@ -54,41 +71,41 @@ const Message = ({
         )}
       >
         <div className="flex items-start gap-2">
-          <Hint label={formatFullTime(createdAt)}>
+          <Hint label={formatFullTime(new Date(createdAt))}>
             <button className="text-xs text-muted-foreground opacity-0 group-hover:opacity-100 w-[40px] leading-[22px] text-center hover:underline">
-              {format(createdAt, "hh:mm")}
+              {createdAt}
             </button>
           </Hint>
           <div className="flex flex-col w-full">
             <Renderer value={body} />
-            {updatedAt ? (
+            {image && <Thumbnail url={image} />}
+            {updatedAt && (
               <span className="text-xs text-muted-foreground">Edited</span>
-            ) : null}
+            )}
           </div>
         </div>
       </div>
     );
   }
+
   return (
     <div className="w-full flex gap-2 p-1.5 px-5 hover:bg-gray-100/60 group relative">
       <div className="w-full flex items-start gap-2">
         <button>
           <Avatar className="size-5 rounded-md mr-1">
-            <AvatarImage
-              className="rounded-md"
-              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSnS1o3mO3S_Nkfw1WAGaRJ6KaOGgODpfoOsA&s"
-            />
+            <AvatarImage className="rounded-md" src={authorImage} />
             <AvatarFallback className="rounded-md bg-sky-500 text-white text-xs">
               {avatarFallback}
             </AvatarFallback>
           </Avatar>
         </button>
+
         {isEditing ? (
           <div className="w-full h-full">
             <Editor
               onSubmit={() => {}}
               disabled={false}
-              defaultValue="hello"
+              defaultValue={body}
               onCancel={() => setEditingId(null)}
               variant="update"
             />
@@ -96,37 +113,35 @@ const Message = ({
         ) : (
           <div className="flex flex-col w-full overflow-hidden">
             <div className="text-sm">
-              <button
-                onClick={() => {}}
-                className="font-bold text-primary hover:underline"
-              >
-                Seerat Ali
+              <button className="font-bold text-primary hover:underline">
+                {authorName}
               </button>
               <span>&nbsp;&nbsp;</span>
-              <Hint label={formatFullTime(createdAt)}>
+              <Hint label={formatFullTime(new Date(createdAt))}>
                 <button className="text-xs text-muted-foreground hover:underline">
-                  {format(createdAt, "hh:mm a")}
+                  {createdAt}
                 </button>
               </Hint>
             </div>
             <div className="flex flex-col w-full">
               <Renderer value={body} />
-              <Thumbnail url="https://media.istockphoto.com/id/814423752/photo/eye-of-model-with-colorful-art-make-up-close-up.jpg?s=612x612&w=0&k=20&c=l15OdMWjgCKycMMShP8UK94ELVlEGvt7GmB_esHWPYE=" />
-              {updatedAt ? (
+              {image && <Thumbnail url={image} />}
+              {updatedAt && (
                 <span className="text-xs text-muted-foreground">(edited)</span>
-              ) : null}
-              <Reactions data={[]} onChange={() => {}} />
+              )}
+              <Reactions data={reactions} onChange={() => {}} />
             </div>
           </div>
         )}
       </div>
+
       {!isEditing && (
         <Toolbar
-          isAuthor={true}
+          isAuthor={isAuthor}
           isPending={false}
-          handleEdit={() => setEditingId(1)}
+          handleEdit={() => setEditingId(id)}
           handleDelete={() => {}}
-          handleThread={() => {}}
+          handleThread={() => openThread(id)} // 👈 you probably added this
           handleReaction={() => {}}
           hideThreadButton={hideThreadButton}
         />

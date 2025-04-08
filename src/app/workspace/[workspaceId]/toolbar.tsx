@@ -4,7 +4,7 @@ import React from "react";
 
 const Toolbar = () => {
   return (
-    <nav className="bg-[#0297b1] flex items-end justify-between h-10 p-1.5">
+    <nav className="bg-[#4A154B] flex items-end justify-between h-10 p-1.5">
       <div className="flex-1" />
       <div className="min-w-[280px] max-w-[642px] grow-[2] shrink">
         <Button
