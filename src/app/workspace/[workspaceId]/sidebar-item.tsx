@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
 import { LucideIcon } from "lucide-react";
-import Link from "next/link";
 import React from "react";
 import { IconType } from "react-icons/lib";
 import { cva, type VariantProps } from "class-variance-authority";
@@ -12,7 +11,7 @@ const sidebarItemVariants = cva(
     variants: {
       variant: {
         default: "text-[#f9edffcc]",
-        active: "text-[#0297b1] bg-white/90",
+        active: "text-[#4A154B] bg-white/90",
       },
     },
     defaultVariants: {
@@ -26,20 +25,19 @@ interface SidebarItemProps {
   id: string;
   icon: LucideIcon | IconType;
   variant?: VariantProps<typeof sidebarItemVariants>["variant"];
+  onClick?: () => void;
 }
 
-const SidebarItem = ({ label, id, icon: Icon, variant }: SidebarItemProps) => {
+const SidebarItem = ({ label, id, icon: Icon, variant, onClick }: SidebarItemProps) => {
   return (
     <Button
       variant="transparent"
       size="sm"
       className={cn(sidebarItemVariants({ variant: variant }))}
-      asChild
+      onClick={onClick}
     >
-      <Link href="/workspace/1/channel/1">
-        <Icon className="size-3.5 mr-1 shrink-0" />
-        <span className="text-sm truncate">{label}</span>
-      </Link>
+      <Icon className="size-3.5 mr-1 shrink-0" />
+      <span className="text-sm truncate">{label}</span>
     </Button>
   );
 };

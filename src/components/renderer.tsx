@@ -6,35 +6,33 @@ interface RenderereProps {
 }
 
 const Renderer = ({ value }: RenderereProps) => {
-  const [isEmpty, setIsEmpty] = useState(false);
   const rendererRef = useRef<HTMLDivElement>(null);
+  const [isEmpty, setIsEmpty] = useState(false);
 
   useEffect(() => {
     if (!rendererRef.current) return;
+
     const container = rendererRef.current;
+    const tempContainer = document.createElement("div");
+    const quill = new Quill(tempContainer, { theme: "snow" });
+    
+    // Load the HTML into Quill
+    quill.clipboard.dangerouslyPasteHTML(value);
+    
+    // Check if it's empty
+    const text = quill.getText().trim();
+    setIsEmpty(text.length === 0);
 
-    const quill = new Quill(document.createElement("div"), { theme: "snow" });
-
-    quill.enable(false);
-
-    // const contents = JSON.parse(value);
-    const isEmpty =
-      quill
-        .getText()
-        .replace(/<(.|\n)*?>/g, "")
-        .trim().length === 0;
-    setIsEmpty(isEmpty);
+    // Set the rendered HTML
     container.innerHTML = quill.root.innerHTML;
 
     return () => {
-      if (container) {
-        container.innerHTML = "";
-      }
+      container.innerHTML = "";
     };
   }, [value]);
 
-  if (isEmpty) return "Hello";
-  return <div ref={rendererRef} className="ql-editor ql-rendere" />;
+  if (isEmpty) return <div className="text-muted-foreground">No content</div>;
+  return <div ref={rendererRef} className="ql-editor ql-renderer px-0" style={{ paddingLeft: 0, paddingRight: 0 }}/>;
 };
 
 export default Renderer;

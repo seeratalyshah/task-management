@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
 import React, { useState } from "react";
-import Toolbar from "./Toolbar";
+import Toolbar from "./toolbar";
 import Sidebar from "./sidebar";
 
 import {
@@ -15,7 +15,7 @@ import { Thread } from "@/features/messages/components/thread";
 
 interface WorkSpaceIdLayoutProps {
   children: React.ReactNode;
-  showPanel: boolean;
+  showPanel?: boolean; // optional
   parentMessageId: number;
 }
 
@@ -24,6 +24,8 @@ const WorkspaceIdlayout = ({
   showPanel = true,
   parentMessageId = 1,
 }: WorkSpaceIdLayoutProps) => {
+  const [isThreadOpen, setIsThreadOpen] = useState(showPanel);
+
   return (
     <div className="h-full">
       <Toolbar />
@@ -33,18 +35,22 @@ const WorkspaceIdlayout = ({
           <ResizablePanel
             defaultSize={20}
             minSize={11}
-            className="bg-[#03abc9]"
+            className="bg-[#661c68]"
           >
             <WorkspaceSidebar />
           </ResizablePanel>
           <ResizableHandle withHandle />
           <ResizablePanel minSize={20}>{children}</ResizablePanel>
-          {showPanel && (
+
+          {isThreadOpen && (
             <>
               <ResizableHandle withHandle />
               <ResizablePanel minSize={20} defaultSize={29}>
                 {parentMessageId ? (
-                  <Thread messageId = {parentMessageId} onClose={() => {}} />
+                  <Thread
+                    messageId={parentMessageId}
+                    onClose={() => setIsThreadOpen(false)}
+                  />
                 ) : (
                   <div className="flex h-full items-center justify-center">
                     <Loader className="size-5 animate-spin text-muted-foreground" />

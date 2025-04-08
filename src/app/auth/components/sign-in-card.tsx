@@ -12,16 +12,17 @@ import React, { useState, useEffect } from "react";
 import { FaGithub } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { SignInFlow } from "../types";
-import { loginRequest, msalConfig } from "../../../../msalConfig";
+import { msalConfig } from "../../../../msalConfig";
 import { PublicClientApplication } from "@azure/msal-browser";
 
 interface SignInCardProps {
   setState: (state: SignInFlow) => void;
+  onLoginSuccess: () => void;
 }
 
 const msalInstance = new PublicClientApplication(msalConfig);
 
-const SignInCard = ({ setState }: SignInCardProps) => {
+const SignInCard = ({ setState, onLoginSuccess }: SignInCardProps) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false); // Track loading state
@@ -33,21 +34,30 @@ const SignInCard = ({ setState }: SignInCardProps) => {
     });
   }, []);
 
+  // Update the handleLogin function in your SignInCard component
   const handleLogin = async () => {
-    if (loading) {
-      console.log("Login is already in progress...");
-      return; // Prevent multiple logins at the same time
-    }
-
+    console.log("Login initiated"); // Debug log
+    if (loading) return;
+  
+    setLoading(true);
+    console.log("Loading state set to true"); // Debug log
+  
     try {
-      setLoading(true); // Set loading state to true while logging in
-      const loginResponse = await msalInstance.loginPopup(loginRequest);
-      console.log("Login Successful!", loginResponse);
-      // You can handle post-login logic here, like saving tokens
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      console.log("After simulated delay"); // Debug log
+  
+      if (email === "seerat@gmail.com" && password === "1234") {
+        console.log("Credentials valid, calling onLoginSuccess"); // Debug log
+        onLoginSuccess();
+      } else {
+        console.log("Invalid credentials"); // Debug log
+        throw new Error("Please enter credentials");
+      }
     } catch (error) {
       console.error("Login Failed!", error);
     } finally {
-      setLoading(false); // Reset loading state
+      console.log("Login process complete"); // Debug log
+      setLoading(false);
     }
   };
 
@@ -60,7 +70,13 @@ const SignInCard = ({ setState }: SignInCardProps) => {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-5 px-0 pb-0">
-        <form className="space-y-2.5">
+        <form
+          className="space-y-2.5"
+          onSubmit={(e) => {
+            e.preventDefault(); // Prevent default form submission
+            handleLogin(); // Call your login handler
+          }}
+        >
           <Input
             disabled={false}
             value={email}
@@ -77,8 +93,13 @@ const SignInCard = ({ setState }: SignInCardProps) => {
             type="password"
             required={true}
           />
-          <Button type="submit" size="lg" disabled={false} className="w-full">
-            Continue
+          <Button
+            type="submit"
+            size="lg"
+            disabled={loading} // Add loading state here too
+            className="w-full"
+          >
+            {loading ? "Logging in..." : "Continue"}
           </Button>
         </form>
         <Separator />
