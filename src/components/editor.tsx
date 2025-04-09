@@ -77,15 +77,17 @@ const Editor = ({
             enter: {
               key: "Enter",
               handler: () => {
+                const quill = quillRef.current;
+                if (!quill) return;
+                
                 const text = quill.getText();
                 const addedImage = imageElementRef.current?.files?.[0] || null;
-                const isEmpty =
-                  !addedImage &&
-                  text.replace(/<(.|\n)*?>/g, "").trim().length === 0;
-
+                const isEmpty = !addedImage && text.replace(/<(.|\n)*?>/g, "").trim().length === 0;
+        
                 if (isEmpty) return;
+                
                 const body = JSON.stringify(quill.getContents());
-                submitRef.current?.({ body, image: addedImage });
+                handleSubmit({ body, image: addedImage });
               },
             },
             shift_enter: {
@@ -147,6 +149,23 @@ const Editor = ({
     const quill = quillRef.current;
 
     quill?.insertText(quill?.getSelection()?.index || 0, emoji.native);
+  };
+
+  const handleSubmit = ({ body, image }: { body: string; image: string }) => {
+    const quill = quillRef.current;
+    if (!quill) return;
+  
+    const text = quill.getText();
+    const isEmpty = !image && text.replace(/<(.|\n)*?>/g, "").trim().length === 0;
+    
+    if (isEmpty) return;
+  
+    submitRef.current?.({ body, image });
+    quill.setContents([]); // Clear the editor after submit
+    setImage(null); // Clear any uploaded image
+    if (imageElementRef.current) {
+      imageElementRef.current.value = "";
+    }
   };
 
   return (

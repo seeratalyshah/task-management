@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Header from "../../../header";
 import ChatInput from "../../../chat-input";
 import MessageList from "@/components/message-list";
@@ -17,7 +17,9 @@ const userData = {
         authorImage: "https://randomuser.me/api/portraits/women/44.jpg",
         authorName: "Seerat Ali",
         isAuthor: false,
-        reactions: [],
+        reactions: [
+          { emoji: "😊", count: 1, users: ["current"] } // You reacted
+        ],
         body: "Hey, how are you doing?",
         image: "",
         createdAt: Date.now() - 3600000,
@@ -29,7 +31,9 @@ const userData = {
         authorImage: "https://randomuser.me/api/portraits/men/22.jpg",
         authorName: "You",
         isAuthor: true,
-        reactions: [],
+        reactions: [
+          { emoji: "👍", count: 1, users: ["1"] } // Seerat Ali reacted
+        ],
         body: "I'm good, thanks for asking!",
         image: "",
         createdAt: Date.now() - 1800000,
@@ -100,26 +104,41 @@ const userData = {
 const UserIdPage = () => {
   const params = useParams();
   const userId = params.userId as string;
+  const [messages, setMessages] = useState(userData[userId]?.messages || []);
 
-  // Get user info from dummy data
-  const user = userData[userId] || {
-    name: "Unknown User",
-    messages: [],
+  const handleSendMessage = ({ body, image }: { body: string; image: string }) => {
+    const newMessage = {
+      id: Date.now().toString(),
+      memberId: "current",
+      authorImage: "https://randomuser.me/api/portraits/men/22.jpg",
+      authorName: "You",
+      isAuthor: true,
+      reactions: [],
+      body: JSON.parse(body).ops[0].insert.trim(),
+      image: image || "",
+      createdAt: Date.now(),
+      updatedAt: null,
+    };
+
+    setMessages([...messages, newMessage]);
   };
 
   return (
     <div className="flex flex-col h-full">
-      <Header title={user.name} isUser />
+      <Header title={userData[userId]?.name || "Unknown User"} isUser />
       <MessageList
         variant="conversation"
-        channelName={`Direct Message with ${user.name}`}
-        channelCreationTime={Date.now() - 86400000} // 1 day ago
-        data={user.messages}
+        channelName={`Direct Message with ${userData[userId]?.name || "user"}`}
+        channelCreationTime={Date.now() - 86400000}
+        data={messages}
         loadMore={() => {}}
         isLoadingMore={false}
         canLoadMore={false}
       />
-      <ChatInput placeholder={`Message ${user.name}`} />
+      <ChatInput 
+        placeholder={`Message ${userData[userId]?.name || "user"}`} 
+        onSend={handleSendMessage}
+      />
     </div>
   );
 };

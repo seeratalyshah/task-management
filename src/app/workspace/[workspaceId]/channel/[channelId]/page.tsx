@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Header from "../../../header";
 import ChatInput from "../../../chat-input";
 import MessageList from "@/components/message-list";
@@ -18,7 +18,10 @@ const channelData = {
         authorImage: "https://randomuser.me/api/portraits/women/44.jpg",
         authorName: "Seerat Ali",
         isAuthor: false,
-        reactions: [],
+        reactions: [
+          { emoji: "👍", count: 2, users: ["1", "2"] }, // Seerat Ali and John Doe reacted
+          { emoji: "❤️", count: 1, users: ["3"] } // Jane Smith reacted
+        ],
         body: "Hello everyone! Welcome to the General channel!",
         image: "",
         createdAt: Date.now() - 3600000, // 1 hour ago
@@ -30,7 +33,9 @@ const channelData = {
         authorImage: "https://randomuser.me/api/portraits/men/32.jpg",
         authorName: "John Doe",
         isAuthor: false,
-        reactions: [],
+        reactions: [
+          { emoji: "😂", count: 1, users: ["1"] } // Seerat Ali reacted
+        ],
         body: "Thanks for having me here! Looking forward to collaborating.",
         image: "https://images.pexels.com/photos/414612/pexels-photo-414612.jpeg",
         createdAt: Date.now() - 1800000, // 30 mins ago
@@ -91,27 +96,41 @@ const channelData = {
 const ChannelIdPage = () => {
   const params = useParams();
   const channelId = params.channelId as string;
+  const [messages, setMessages] = useState(channelData[channelId]?.messages || []);
 
-  // Get channel info from dummy data
-  const channel = channelData[channelId] || {
-    name: "Unknown Channel",
-    creationTime: Date.now(),
-    messages: [],
+  const handleSendMessage = ({ body, image }: { body: string; image: string }) => {
+    const newMessage = {
+      id: Date.now().toString(),
+      memberId: "current", // Assuming current user
+      authorImage: "https://randomuser.me/api/portraits/men/22.jpg",
+      authorName: "You",
+      isAuthor: true,
+      reactions: [],
+      body: JSON.parse(body).ops[0].insert.trim(),
+      image: image || "",
+      createdAt: Date.now(),
+      updatedAt: null,
+    };
+
+    setMessages([...messages, newMessage]);
   };
 
   return (
     <div className="flex flex-col h-full">
-      <Header title={channel.name} />
+      <Header title={channelData[channelId]?.name || "Unknown Channel"} />
       <MessageList
         variant="channel"
-        channelName={channel.name}
-        channelCreationTime={channel.creationTime}
-        data={channel.messages}
+        channelName={channelData[channelId]?.name || "Unknown Channel"}
+        channelCreationTime={channelData[channelId]?.creationTime || Date.now()}
+        data={messages}
         loadMore={() => {}}
         isLoadingMore={false}
         canLoadMore={false}
       />
-      <ChatInput placeholder={`Message #${channel.name}`} />
+      <ChatInput 
+        placeholder={`Message #${channelData[channelId]?.name || "channel"}`} 
+        onSend={handleSendMessage}
+      />
     </div>
   );
 };

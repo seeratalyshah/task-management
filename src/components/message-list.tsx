@@ -45,7 +45,7 @@ const MessageList = ({
 
   return (
     <div className="flex-1 flex flex-col-reverse pb-4 overflow-y-auto messages-scroll">
-      <div>
+       <div>
         {Object.entries(groupedMessages).map(([date, dayMessages]) => (
           <div key={date}>
             <div className="text-center my-2 relative">
@@ -56,12 +56,19 @@ const MessageList = ({
             </div>
             
             {dayMessages.map((message, index) => {
-              const previousMessage = dayMessages[index - 1];
-              const isCompact = previousMessage && 
-                previousMessage.memberId === message.memberId &&
+              // Find the previous message from the same member
+              let previousMessageFromSameMember = null;
+              for (let i = index - 1; i >= 0; i--) {
+                if (dayMessages[i].memberId === message.memberId) {
+                  previousMessageFromSameMember = dayMessages[i];
+                  break;
+                }
+              }
+
+              const isCompact = previousMessageFromSameMember && 
                 differenceInMinutes(
                   message.createdAt,
-                  previousMessage.createdAt
+                  previousMessageFromSameMember.createdAt
                 ) < TIME_THRESHOLD;
 
               return (

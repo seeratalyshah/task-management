@@ -32,7 +32,7 @@ const Renderer = ({ value }: RenderereProps) => {
   }, [value]);
 
   if (isEmpty) return <div className="text-muted-foreground">No content</div>;
-  return <div ref={rendererRef} className="ql-editor ql-renderer px-0" style={{ paddingLeft: 0, paddingRight: 0 }}/>;
+  return <div ref={rendererRef} className="ql-editor ql-renderer px-0 p-0" style={{ paddingLeft: 0, paddingRight: 0 }}/>;
 };
 
 export default Renderer;

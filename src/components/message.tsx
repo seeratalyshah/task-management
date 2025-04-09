@@ -29,7 +29,7 @@ interface MessageProps {
   threadCount?: number;
   threadImage?: string;
   threadTimestamp?: number;
-  openThread?: (id: number) => void; // <-- New prop for opening thread
+  openThread?: (id: string) => void;
 }
 
 const formatFullTime = (dateInput: string | Date) => {
@@ -58,7 +58,7 @@ const Message = ({
   threadCount,
   threadImage,
   threadTimestamp,
-  openThread, // <-- Destructure the new prop
+  openThread,
 }: MessageProps) => {
   const avatarFallback = authorName.charAt(0).toUpperCase();
 
@@ -76,11 +76,16 @@ const Message = ({
               {createdAt}
             </button>
           </Hint>
-          <div className="flex flex-col w-full">
+          <div className="flex flex-col w-full group/message">
             <Renderer value={body} />
             {image && <Thumbnail url={image} />}
             {updatedAt && (
               <span className="text-xs text-muted-foreground">Edited</span>
+            )}
+            {reactions.length > 0 && (
+              <div className="transition">
+                <Reactions data={reactions} onChange={() => {}} />
+              </div>
             )}
           </div>
         </div>
@@ -111,7 +116,7 @@ const Message = ({
             />
           </div>
         ) : (
-          <div className="flex flex-col w-full overflow-hidden">
+          <div className="flex flex-col w-full overflow-hidden group/message">
             <div className="text-sm">
               <button className="font-bold text-primary hover:underline">
                 {authorName}
@@ -129,22 +134,28 @@ const Message = ({
               {updatedAt && (
                 <span className="text-xs text-muted-foreground">(edited)</span>
               )}
-              <Reactions data={reactions} onChange={() => {}} />
+              {reactions.length > 0 && (
+                <div className="transition">
+                  <Reactions data={reactions} onChange={() => {}} />
+                </div>
+              )}
             </div>
           </div>
         )}
       </div>
 
       {!isEditing && (
-        <Toolbar
-          isAuthor={isAuthor}
-          isPending={false}
-          handleEdit={() => setEditingId(id)}
-          handleDelete={() => {}}
-          handleThread={() => openThread(id)} // 👈 you probably added this
-          handleReaction={() => {}}
-          hideThreadButton={hideThreadButton}
-        />
+        <div className="opacity-0 group-hover:opacity-100 transition">
+          <Toolbar
+            isAuthor={isAuthor}
+            isPending={false}
+            handleEdit={() => setEditingId(id)}
+            handleDelete={() => {}}
+            handleThread={() => openThread?.(id.toString())}
+            handleReaction={() => {}}
+            hideThreadButton={hideThreadButton}
+          />
+        </div>
       )}
     </div>
   );
