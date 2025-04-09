@@ -14,7 +14,7 @@ const ChatInput = ({ placeholder, onSend }: ChatInputProps) => {
   const editorRef = useRef<Quill | null>(null);
 
   return (
-    <div className="px-5 pb-5 w-full">
+    <div className="px-5 w-full">
       <Editor
         variant="create"
         placeholder={placeholder}

@@ -25,7 +25,7 @@ const WorkspaceSelector = () => {
       description: "Muslim Hands is an international aid agency and...",
       members: 120,
       channels: 25,
-      lastActive: "Today"
+      lastActive: "Today",
     },
     {
       id: "tech-startup", // Added ID
@@ -33,7 +33,7 @@ const WorkspaceSelector = () => {
       description: "Building the next generation of software products.",
       members: 32,
       channels: 10,
-      lastActive: "3 days ago"
+      lastActive: "3 days ago",
     },
     {
       id: "acme-corp", // Added ID
@@ -41,8 +41,8 @@ const WorkspaceSelector = () => {
       description: "A global leader in innovative solutions and...",
       members: 85,
       channels: 18,
-      lastActive: "Yesterday"
-    }
+      lastActive: "Yesterday",
+    },
   ];
 
   const handleWorkspaceSelect = (workspaceId: string) => {
@@ -51,28 +51,30 @@ const WorkspaceSelector = () => {
   };
 
   return (
-    <div className="p-8 max-w-2xl mx-auto">
+    <div className="p-8 mx-auto">
       <Card className="border-0 shadow-none">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">Select a workspace</CardTitle>
         </CardHeader>
-        
-        <div className="space-y-4 mt-6">
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
           {workspaces.map((workspace) => (
-            <Card 
+            <Card
               key={workspace.id}
               className="p-6 hover:bg-gray-50 cursor-pointer"
               onClick={() => handleWorkspaceSelect(workspace.id)} // Added click handler
             >
               <h3 className="font-semibold text-lg">{workspace.name}</h3>
-              <p className="text-sm text-gray-600 mt-1">{workspace.description}</p>
+              <p className="text-sm text-gray-600 mt-1">
+                {workspace.description}
+              </p>
               <div className="flex gap-4 mt-3 text-sm text-gray-500">
                 <span>{workspace.members} members</span>
                 <span>{workspace.channels} channels</span>
                 <span>Last active: {workspace.lastActive}</span>
               </div>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 className="mt-4"
                 onClick={(e) => {
                   e.stopPropagation(); // Prevent card click from triggering
@@ -83,15 +85,17 @@ const WorkspaceSelector = () => {
               </Button>
             </Card>
           ))}
-        </div>
+          <Card className="p-6 hover:bg-gray-50 cursor-pointer">
+            <h3 className="font-semibold text-lg">Create a new workspace</h3>
+            <p className="text-sm text-gray-600 mt-1">
+              {" "}
+              Start fresh with a new Slack workspace for your team
+            </p>
 
-        <div className="mt-8 text-center">
-          <Button variant="ghost">
-            Create a new workspace
-          </Button>
-          <p className="text-sm text-gray-500 mt-1">
-            Start fresh with a new Slack workspace for your team
-          </p>
+            <Button variant="outline" className="mt-4">
+              Create a new workspace
+            </Button>
+          </Card>
         </div>
       </Card>
     </div>

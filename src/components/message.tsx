@@ -32,13 +32,7 @@ interface MessageProps {
   openThread?: (id: string) => void;
 }
 
-const formatFullTime = (dateInput: string | Date) => {
-  const date = typeof dateInput === "string" ? new Date(dateInput) : dateInput;
-  if (isNaN(date.getTime())) {
-    return "Unknown date";
-  }
-  return `${isToday(date) ? "Today" : isYesterday(date) ? "Yesterday" : format(date, "MMM d, yyyy")} at ${format(date, "hh:mm:ss a")}`;
-};
+const removeAMPM = (time: string): string => time.replace(/\s?(AM|PM)$/i, '');
 
 const Message = ({
   id,
@@ -70,13 +64,13 @@ const Message = ({
           isEditing && "bg-[#f2c74433] hover:bg-[#f2c74433]"
         )}
       >
-        <div className="flex items-start gap-2">
-          <Hint label={formatFullTime(new Date(createdAt))}>
-            <button className="text-xs text-muted-foreground opacity-0 group-hover:opacity-100 w-[40px] leading-[22px] text-center hover:underline">
-              {createdAt}
+        <div className="flex items-start">
+          <Hint label={createdAt}>
+            <button className="text-xs text-muted-foreground opacity-0 group-hover:opacity-100 w-[40px] leading-[22px] text-left hover:underline">
+            {removeAMPM(createdAt)}
             </button>
           </Hint>
-          <div className="flex flex-col w-full group/message">
+          <div className="flex flex-col w-full group/message mr-4">
             <Renderer value={body} />
             {image && <Thumbnail url={image} />}
             {updatedAt && (
@@ -89,6 +83,19 @@ const Message = ({
             )}
           </div>
         </div>
+        {!isEditing && (
+        <div className="opacity-0 group-hover:opacity-100 transition">
+          <Toolbar
+            isAuthor={isAuthor}
+            isPending={false}
+            handleEdit={() => setEditingId(id)}
+            handleDelete={() => {}}
+            handleThread={() => openThread?.(id.toString())}
+            handleReaction={() => {}}
+            hideThreadButton={hideThreadButton}
+          />
+        </div>
+      )}
       </div>
     );
   }
@@ -122,7 +129,7 @@ const Message = ({
                 {authorName}
               </button>
               <span>&nbsp;&nbsp;</span>
-              <Hint label={formatFullTime(new Date(createdAt))}>
+              <Hint label={createdAt}>
                 <button className="text-xs text-muted-foreground hover:underline">
                   {createdAt}
                 </button>

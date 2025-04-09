@@ -29,7 +29,7 @@ const WorkspaceIdlayout = ({
   return (
     <div className="h-full">
       <Toolbar />
-      <div className="flex h-[94.5vh]">
+      <div className="flex" style={{height: "calc(100vh - 40px)"}}>
         <Sidebar />
         <ResizablePanelGroup direction="horizontal">
           <ResizablePanel
