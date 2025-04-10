@@ -29,16 +29,10 @@ interface MessageProps {
   threadCount?: number;
   threadImage?: string;
   threadTimestamp?: number;
-  openThread?: (id: number) => void; // <-- New prop for opening thread
+  openThread?: (id: string) => void;
 }
 
-const formatFullTime = (dateInput: string | Date) => {
-  const date = typeof dateInput === "string" ? new Date(dateInput) : dateInput;
-  if (isNaN(date.getTime())) {
-    return "Unknown date";
-  }
-  return `${isToday(date) ? "Today" : isYesterday(date) ? "Yesterday" : format(date, "MMM d, yyyy")} at ${format(date, "hh:mm:ss a")}`;
-};
+const removeAMPM = (time: string): string => time.replace(/\s?(AM|PM)$/i, '');
 
 const Message = ({
   id,
@@ -58,7 +52,7 @@ const Message = ({
   threadCount,
   threadImage,
   threadTimestamp,
-  openThread, // <-- Destructure the new prop
+  openThread,
 }: MessageProps) => {
   const avatarFallback = authorName.charAt(0).toUpperCase();
 
@@ -70,20 +64,38 @@ const Message = ({
           isEditing && "bg-[#f2c74433] hover:bg-[#f2c74433]"
         )}
       >
-        <div className="flex items-start gap-2">
-          <Hint label={formatFullTime(new Date(createdAt))}>
-            <button className="text-xs text-muted-foreground opacity-0 group-hover:opacity-100 w-[40px] leading-[22px] text-center hover:underline">
-              {createdAt}
+        <div className="flex items-start">
+          <Hint label={createdAt}>
+            <button className="text-xs text-muted-foreground opacity-0 group-hover:opacity-100 w-[40px] leading-[22px] text-left hover:underline">
+            {removeAMPM(createdAt)}
             </button>
           </Hint>
-          <div className="flex flex-col w-full">
+          <div className="flex flex-col w-full group/message mr-4">
             <Renderer value={body} />
             {image && <Thumbnail url={image} />}
             {updatedAt && (
               <span className="text-xs text-muted-foreground">Edited</span>
             )}
+            {reactions.length > 0 && (
+              <div className="transition">
+                <Reactions data={reactions} onChange={() => {}} />
+              </div>
+            )}
           </div>
         </div>
+        {!isEditing && (
+        <div className="opacity-0 group-hover:opacity-100 transition">
+          <Toolbar
+            isAuthor={isAuthor}
+            isPending={false}
+            handleEdit={() => setEditingId(id)}
+            handleDelete={() => {}}
+            handleThread={() => openThread?.(id.toString())}
+            handleReaction={() => {}}
+            hideThreadButton={hideThreadButton}
+          />
+        </div>
+      )}
       </div>
     );
   }
@@ -111,13 +123,13 @@ const Message = ({
             />
           </div>
         ) : (
-          <div className="flex flex-col w-full overflow-hidden">
+          <div className="flex flex-col w-full overflow-hidden group/message">
             <div className="text-sm">
               <button className="font-bold text-primary hover:underline">
                 {authorName}
               </button>
               <span>&nbsp;&nbsp;</span>
-              <Hint label={formatFullTime(new Date(createdAt))}>
+              <Hint label={createdAt}>
                 <button className="text-xs text-muted-foreground hover:underline">
                   {createdAt}
                 </button>
@@ -129,22 +141,28 @@ const Message = ({
               {updatedAt && (
                 <span className="text-xs text-muted-foreground">(edited)</span>
               )}
-              <Reactions data={reactions} onChange={() => {}} />
+              {reactions.length > 0 && (
+                <div className="transition">
+                  <Reactions data={reactions} onChange={() => {}} />
+                </div>
+              )}
             </div>
           </div>
         )}
       </div>
 
       {!isEditing && (
-        <Toolbar
-          isAuthor={isAuthor}
-          isPending={false}
-          handleEdit={() => setEditingId(id)}
-          handleDelete={() => {}}
-          handleThread={() => openThread(id)} // 👈 you probably added this
-          handleReaction={() => {}}
-          hideThreadButton={hideThreadButton}
-        />
+        <div className="opacity-0 group-hover:opacity-100 transition">
+          <Toolbar
+            isAuthor={isAuthor}
+            isPending={false}
+            handleEdit={() => setEditingId(id)}
+            handleDelete={() => {}}
+            handleThread={() => openThread?.(id.toString())}
+            handleReaction={() => {}}
+            hideThreadButton={hideThreadButton}
+          />
+        </div>
       )}
     </div>
   );
